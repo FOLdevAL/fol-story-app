@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Outdoor Living | The Story</title>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            /* Dark Slate */
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3,
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        /* Utilities */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #FB923C, #F3F423);
+        }
+
+        .clip-text-image {
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            -webkit-background-clip: text;
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Sticky Horizontal Scroll Container */
+        .sticky-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .horizontal-track {
+            display: flex;
+            gap: 4rem;
+            padding-left: 5vw;
+            will-change: transform;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Components ---
+
+        // 1. Navigation / Header
+        const Header = () => (
+            <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-6 mix-blend-difference text-white">
+                <div className="text-2xl font-bold tracking-tighter serif italic">
+                    Fun Outdoor Living
+                </div>
+                <button className="bg-white text-black px-5 py-2 rounded-full font-bold text-xs uppercase tracking-wide hover:scale-105 transition-transform">
+                    Start Project
+                </button>
+            </nav>
+        );
+
+        // 2. Hero Section
+        const Hero = () => {
+            const [offset, setOffset] = useState(0);
+
+            useEffect(() => {
+                const handleScroll = () => setOffset(window.scrollY);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+                    {/* Parallax Background */}
+                    <div
+                        className="absolute inset-0 z-0 bg-cover bg-center opacity-60"
+                        style={{
+                            backgroundImage: "url('https://funoutdoorliving.com/wp-content/uploads/2019/12/pergolas-gallery-14-1.jpg')",
+                            transform: `translateY(${offset * 0.5}px)`
+                        }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/20 to-slate-900 z-10"></div>
+
+                    <div className="relative z-20 text-center px-4 max-w-5xl">
+                        <h1 className="text-5xl md:text-8xl lg:text-9xl font-bold mb-6 tracking-tighter leading-none reveal-up active">
+                            Backyard <br />
+                            <span className="text-gradient">Dreams.</span>
+                        </h1>
+                        <p className="text-xl md:text-2xl text-slate-300 font-light max-w-2xl mx-auto mb-10 reveal-up active" style={{ transitionDelay: '200ms' }}>
+                            Crafting personal paradises in the Carolinas since 2004.
+                        </p>
+                        <div className="animate-bounce absolute bottom-0 left-1/2 -translate-x-1/2 opacity-50">
+                            <i data-lucide="arrow-down" className="w-8 h-8"></i>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // 3. The Origin Story (Text Reveal)
+        const OriginStory = () => {
+            const ref = useRef(null);
+            const [visible, setVisible] = useState(false);
+
+            useEffect(() => {
+                const observer = new IntersectionObserver(
+                    ([entry]) => {
+                        if (entry.isIntersecting) setVisible(true);
+                    },
+                    { threshold: 0.3 }
+                );
+                if (ref.current) observer.observe(ref.current);
+                return () => observer.disconnect();
+            }, []);
+
+            return (
+                <section className="min-h-screen flex items-center justify-center py-20 bg-slate-900 relative">
+                    <div ref={ref} className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+                        <div className={`space-y-8 transition-all duration-1000 ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'}`}>
+                            <div className="inline-block px-3 py-1 border border-orange-400 text-orange-400 rounded-full text-xs font-bold uppercase tracking-wider">
+                                EST. 2004
+                            </div>
+                            <h2 className="text-4xl md:text-6xl font-bold serif leading-tight">
+                                It started with <br /> a simple <span className="text-orange-400 italic">vision.</span>
+                            </h2>
+                            <p className="text-lg text-slate-400 leading-relaxed">
+                                Founded by John DiFiore, Fun Outdoor Living began with a mission to bring resort-quality leisure to the Carolinas. What started as a passion for hot tubs has evolved into the region's premier destination for complete outdoor transformations.
+                            </p>
+                            <p className="text-lg text-slate-400 leading-relaxed">
+                                We aren't just contractors; we are creators of memories. From our first showroom to our 5th location, our goal has remained the same: <strong>Make the Backyard FUN Again.</strong>
+                            </p>
+                        </div>
+                        <div className={`relative h-[600px] w-full transition-all duration-1000 delay-300 ${visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+                            <div className="absolute inset-0 bg-slate-800 rounded-2xl overflow-hidden shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700">
+                                <img src="https://funoutdoorliving.com/wp-content/uploads/2024/06/Lake-Norman-Currents-Magazine-by-Lake-Norman-Currents-Issuu.jpg" alt="Founder" className="w-full h-full object-cover opacity-80" />
+                                <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black to-transparent">
+                                    <p className="font-bold text-white text-xl">Family Owned & Operated</p>
+                                    <p className="text-slate-400 text-sm">Serving Charlotte, Matthews, & Beyond</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // 4. Horizontal Scroll Section (Services)
+        const ServicesScroll = () => {
+            const sectionRef = useRef(null);
+            const trackRef = useRef(null);
+            const [progress, setProgress] = useState(0);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    if (!sectionRef.current) return;
+                    const top = sectionRef.current.getBoundingClientRect().top;
+                    const height = sectionRef.current.offsetHeight;
+                    const windowHeight = window.innerHeight;
+
+                    // Calculate how far we've scrolled into the sticky container
+                    // We want the scroll to start when the top hits 0
+                    const rawProgress = -top / (height - windowHeight);
+                    const clamped = Math.max(0, Math.min(1, rawProgress));
+                    setProgress(clamped);
+                };
+
+                window.addEventListener('scroll', handleScroll);
+                handleScroll();
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            // Total width to scroll: 4 cards * roughly 80vw width + gaps
+            // We translate negatively based on progress
+            const translateX = progress * -300; // Moving 300% of view width
+
+            const services = [
+                {
+                    title: "Custom Decks and Porches",
+                    desc: "Best in class outdoor experiences from the ground up.",
+                    img: "https://funoutdoorliving.com/wp-content/uploads/2025/10/10-Catawba-Ridge-Drone-1.jpg",
+                    id: "01"
+                },
+                {
+                    title: "Outdoor Kitchens",
+                    desc: "Gourmet grilling stations and pizza ovens.",
+                    img: "https://funoutdoorliving.com/wp-content/uploads/2020/10/outdoor-kitchen-design-oven.jpg",
+                    id: "02"
+                },
+                {
+                    title: "Premium Outdoor Saunas",
+                    desc: "The ultimate backyard wellness upgrade.",
+                    img: "https://funoutdoorliving.com/wp-content/uploads/2025/04/Pure-Cube-Neptune-Sauna.png",
+                    id: "03"
+                },
+                {
+                    title: "Custom Patios",
+                    desc: "Complete hardscape design and landscaping.",
+                    img: "https://funoutdoorliving.com/wp-content/uploads/2020/04/20140206164930_tn-300x300.jpg",
+                    id: "04"
+                }
+            ];
+
+            return (
+                <div ref={sectionRef} className="relative h-[400vh] bg-black">
+                    <div className="sticky-container w-full overflow-hidden flex items-center bg-slate-950">
+                        <div className="absolute top-10 left-10 z-20">
+                            <h3 className="text-3xl font-bold text-white serif">The Evolution</h3>
+                            <p className="text-slate-500">Scroll to explore our services</p>
+                        </div>
+
+                        <div
+                            ref={trackRef}
+                            className="horizontal-track flex items-center h-full px-20"
+                            style={{ transform: `translateX(${translateX}vw)` }}
+                        >
+                            {/* Intro Card */}
+                            <div className="w-[80vw] md:w-[60vw] h-[70vh] flex-shrink-0 flex items-center justify-center pr-20">
+                                <h2 className="text-6xl md:text-8xl font-bold leading-tight">
+                                    We sell <br />
+                                    <span className="text-gradient">more than</span> <br />
+                                    just spas.
+                                </h2>
+                            </div>
+
+                            {/* Service Cards */}
+                            {services.map((s, i) => (
+                                <div key={i} className="w-[85vw] md:w-[40vw] h-[70vh] flex-shrink-0 relative group overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+                                    <img src={s.img} alt={s.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+
+                                    <div className="absolute top-6 right-6 text-6xl font-bold text-slate-800 serif select-none">{s.id}</div>
+
+                                    <div className="absolute bottom-0 left-0 p-8 w-full">
+                                        <h3 className="text-3xl font-bold mb-2">{s.title}</h3>
+                                        <p className="text-slate-300 text-lg">{s.desc}</p>
+                                        <div className="mt-4 w-12 h-1 bg-orange-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Outro Card */}
+                            <div className="w-[80vw] md:w-[50vw] h-[70vh] flex-shrink-0 flex flex-col items-center justify-center pl-10">
+                                <h2 className="text-5xl font-bold mb-6 text-center">And countless <br /> transformations.</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 5. Stats Counter
+        const Counter = ({ end, label, suffix = "" }) => {
+            const [count, setCount] = useState(0);
+            const ref = useRef(null);
+
+            useEffect(() => {
+                const observer = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) {
+                        let start = 0;
+                        const duration = 2000;
+                        const startTime = performance.now();
+
+                        const animate = (currentTime) => {
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+
+                            // Ease out quart
+                            const ease = 1 - Math.pow(1 - progress, 4);
+
+                            setCount(Math.floor(ease * end));
+
+                            if (progress < 1) {
+                                requestAnimationFrame(animate);
+                            }
+                        };
+                        requestAnimationFrame(animate);
+                    }
+                });
+                if (ref.current) observer.observe(ref.current);
+                return () => observer.disconnect();
+            }, [end]);
+
+            return (
+                <div ref={ref} className="text-center p-8 border border-slate-800 bg-slate-900/50 rounded-lg hover:border-orange-500/50 transition-colors">
+                    <div className="text-5xl md:text-7xl font-bold text-white mb-2 serif">
+                        {count}{suffix}
+                    </div>
+                    <div className="text-orange-400 font-bold uppercase tracking-widest text-sm">{label}</div>
+                </div>
+            );
+        };
+
+        const StatsSection = () => {
+            return (
+                <section className="py-32 bg-slate-950 relative overflow-hidden">
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#4ade80 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+
+                    <div className="container mx-auto px-6 relative z-10">
+                        <div className="text-center mb-20">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-6">Trusted by Neighbors</h2>
+                            <p className="text-slate-400 max-w-2xl mx-auto">From Winston-Salem to Rock Hill, we have been the standard for outdoor living excellence for over two decades.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <Counter end={22} label="Years of Experience" suffix="+" />
+                            <Counter end={5} label="Showroom Locations" />
+                            <Counter end={4700} label="Projects Completed" suffix="+" />
+                            <Counter end={5000} label="Spas Delivered" suffix="+" />
+                            <Counter end={11000} label="Customer Installs" suffix="+" />
+                            <Counter end={2000} label="Patios Completed" suffix="+" />
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // 6. CTA / Configurator Link
+        const CallToAction = () => {
+            return (
+                <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 z-0">
+                        <img src="https://funoutdoorliving.com/wp-content/uploads/2025/10/1338-Ballard-Dr-01-1.jpg" className="w-full h-full object-cover opacity-30" alt="Backyard" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-slate-900/40"></div>
+                    </div>
+
+                    <div className="relative z-10 container mx-auto px-6 text-center">
+                        <h2 className="text-5xl md:text-7xl font-bold mb-8 reveal-up active">
+                            Your turn.
+                        </h2>
+                        <p className="text-xl text-slate-300 mb-12 max-w-xl mx-auto reveal-up active" style={{ transitionDelay: '100ms' }}>
+                            You've seen our story. Now let's write yours. Step into our virtual design studio to start building your own oasis.
+                        </p>
+
+                        <a
+                            href="#" // Placeholder for Configurator Link
+                            className="group relative inline-flex items-center gap-4 px-10 py-5 bg-orange-500 text-slate-900 font-bold text-lg rounded-full hover:bg-white hover:scale-105 transition-all duration-300"
+                        >
+                            <span>Launch In-Home Configurator</span>
+                            <i data-lucide="arrow-right" className="group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+
+                        <div className="mt-8 text-sm text-slate-500">
+                            Coming soon to funoutdoorliving.com
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Footer = () => (
+            <footer className="bg-black text-slate-500 py-12 text-center text-sm border-t border-slate-900">
+                <div className="mb-4 text-2xl text-slate-300 font-bold serif italic">Fun Outdoor Living</div>
+                <p>&copy; 2026 Fun Outdoor Living. All rights reserved.</p>
+            </footer>
+        );
+
+        // --- Main App ---
+        const App = () => {
+            useEffect(() => {
+                // Initialize Lucide icons
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+
+            return (
+                <div className="antialiased selection:bg-orange-500 selection:text-black">
+                    <Header />
+                    <Hero />
+                    <OriginStory />
+                    <ServicesScroll />
+                    <StatsSection />
+                    <CallToAction />
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
